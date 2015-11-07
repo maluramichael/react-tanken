@@ -1,0 +1,16 @@
+{
+  "name": "reacttanken",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "react-native start"
+  },
+  "dependencies": {
+    "react-native": "^0.14.1"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-babel": "^6.1.0",
+    "gulp-watch": "^4.3.5"
+  }
+}
