@@ -2,15 +2,20 @@
 
 var React = require('react-native');
 
-var {AppRegistry, StyleSheet, Text, TextInput, TouchableHighlight, View} = React;
+var {AppRegistry, StyleSheet, Text, TextInput, TouchableHighlight, View, ListView} = React;
 
 var {TabBarIOS} = require('react-native-icons');
 var TabBarItemIOS = TabBarIOS.Item;
 
 let Application = React.createClass({
 	getInitialState: function () {
+		var dataSource = new ListView.DataSource({rowHasChanged: (a, b)=>a !== b});
 		return {
-			selectedTab: 'refill'
+			current: '',
+			price: '',
+			liter: '',
+			selectedTab: 'refill',
+			history: dataSource.cloneWithRows(['row 1', 'row 2'])
 		};
 	},
 
@@ -18,47 +23,62 @@ let Application = React.createClass({
 		return (
 			<View style={[
                 styles.tabContent, {
-                    backgroundColor: 'cornflowerblue'
+                    backgroundColor: '#042536'
                 }
             ]}>
-				<Text>Kilometerstand</Text>
-				<TextInput style={styles.textInput} onChangeText={(text) => this.setState({text})}
+				<Text style={styles.text}>Kilometerstand</Text>
+				<TextInput style={styles.textInput} onChangeText={(text) => this.setState({current: text})}
 						   value={this.state.current}/>
-				<Text>Preis pro Liter</Text>
-				<TextInput style={styles.textInput} onChangeText={(text) => this.setState({text})}
+				<Text style={styles.text}>Preis pro Liter</Text>
+				<TextInput style={styles.textInput} onChangeText={(text) => this.setState({price: text})}
 						   value={this.state.price}/>
-				<Text>Liter getankt</Text>
-				<TextInput style={styles.textInput} onChangeText={(text) => this.setState({text})}
+				<Text style={styles.text}>Liter getankt</Text>
+				<TextInput style={styles.textInput} onChangeText={(text) => this.setState({liter: text})}
 						   value={this.state.liter}/>
-				<TouchableHighlight><Text>Speichern</Text></TouchableHighlight>
+				<TouchableHighlight onPress={this._saveRefill}><Text style={styles.button}>Speichern</Text></TouchableHighlight>
 			</View>
 		)
 	},
-	_renderContent: function (color:string, pageText:string, num:number) {
+	_renderHistory() {
 		return (
 			<View style={[
                 styles.tabContent, {
-                    backgroundColor: color
+                    backgroundColor: 'lightblue'
                 }
             ]}>
-				<Text style={styles.tabText}>{pageText}</Text>
-				<Text style={styles.tabText}>{num}
-					re-renders of the
-					{pageText}</Text>
+				<ListView dataSource={this.state.history}
+						  renderRow={(rowData) => <View><Text>{rowData}</Text></View>}>
+				</ListView>
 			</View>
 		)
 	},
-
+	_saveRefill(){
+		this.setState({
+			liter: '',
+			price: '',
+			current: ''
+		})
+	},
 	render: function () {
 		return (
 			<TabBarIOS tintColor="white" barTintColor="darkslateblue">
-				<TabBarItemIOS name="Tanken" iconName={'ion|ios-paper-outline'} title="Tanken" systemIcon="history" selected={this.state.selectedTab === 'refill'}
-								onPress={() => {
+				<TabBarItemIOS name="Tanken" iconName={'ion|ios-paper-outline'} title="Tanken" systemIcon="history"
+							   selected={this.state.selectedTab === 'refill'}
+							   onPress={() => {
                     this.setState({
                         selectedTab: 'refill'
                     });
                 }}>
 					{this._renderRefill()}
+				</TabBarItemIOS>
+				<TabBarItemIOS name="Verlauf" iconName={'ion|ios-paper-outline'} title="Verlauf"
+							   selected={this.state.selectedTab === 'history'}
+							   onPress={() => {
+                    this.setState({
+                        selectedTab: 'history'
+                    });
+                }}>
+					{this._renderHistory()}
 				</TabBarItemIOS>
 			</TabBarIOS>
 		);
@@ -77,7 +97,15 @@ var styles = StyleSheet.create({
 		color: 'white',
 		margin: 50
 	},
-	button: {},
+	button: {
+		backgroundColor: '#169EA5',
+		padding: 10,
+		color: '#50CCD4',
+		borderRadius: 3
+	},
+	text: {
+		color: '#fff'
+	},
 	textInput: {
 		height: 30,
 		borderColor: '#333',
