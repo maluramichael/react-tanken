@@ -8,15 +8,28 @@ var {TabBarIOS} = require('react-native-icons');
 var TabBarItemIOS = TabBarIOS.Item;
 
 let Application = React.createClass({
+	history: [],
+
 	getInitialState: function () {
-		var dataSource = new ListView.DataSource({rowHasChanged: (a, b)=>a !== b});
 		return {
 			current: '',
 			price: '',
 			liter: '',
 			selectedTab: 'refill',
-			history: dataSource.cloneWithRows(['row 1', 'row 2'])
+			dataSource: new ListView.DataSource({rowHasChanged: (a, b)=>a !== b})
 		};
+	},
+
+	componentDidMount: function(){
+		this.history = [{
+			liter: 1,
+			price: 2,
+			current: 3
+		}];
+
+		this.setState({
+			dataSource: this.state.dataSource.cloneWithRows(this.history)
+		})
 	},
 
 	_renderRefill() {
@@ -46,13 +59,31 @@ let Application = React.createClass({
                     backgroundColor: 'lightblue'
                 }
             ]}>
-				<ListView dataSource={this.state.history}
-						  renderRow={(rowData) => <View><Text>{rowData}</Text></View>}>
+				<ListView dataSource={this.state.dataSource}
+						  renderRow={(rowData) => <View><Text> Liter {rowData.liter}</Text></View>}>
 				</ListView>
 			</View>
 		)
 	},
 	_saveRefill(){
+
+		// append current refill state to history
+		var currentData = {
+			liter: this.state.liter,
+			price: this.state.price,
+			current: this.state.current
+		};
+
+		var id = this.history.length;
+
+		this.setState({
+			dataSource: this.state.dataSource.cloneWithRows(this.history)
+		});
+
+		// save history in persistent storage
+		//AsyncStorage.setItem('history', this.state.history);
+
+		// clear current state
 		this.setState({
 			liter: '',
 			price: '',
@@ -85,7 +116,7 @@ let Application = React.createClass({
 	}
 });
 
-var reacttanken = new Application()
+var reacttanken = new Application();
 
 var styles = StyleSheet.create({
 	tabContent: {
